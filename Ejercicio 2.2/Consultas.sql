@@ -11,7 +11,8 @@ From Clientes as CL Inner Join Ciudades as C ON C.ID = CL.IDCiudad Inner Join Pa
 Select CL.RazonSocial, CL.Cuit, C.Nombre as Ciudad, P.Nombre as Pais 
 From Clientes as CL Left Join Ciudades as C ON C.ID = CL.IDCiudad Left Join Paises as P ON P.ID = C.IDPais
 
--- 4)Por cada cliente listar razón social, cuit y nombre de la ciudad y nombre del país. Listar también los datos de aquellas ciudades y países que no tengan clientes relacionados.
+-- 4)Por cada cliente listar razón social, cuit y nombre de la ciudad y nombre del país. Listar también los datos de aquellas ciudades y países 
+--que no tengan clientes relacionados.
 Select CL.RazonSocial, CL.Cuit, C.Nombre as Ciudad, P.Nombre as Pais 
 From Clientes as CL Right Join Ciudades as C ON C.ID = CL.IDCiudad Right Join Paises as P ON P.ID = C.IDPais
 
@@ -39,7 +40,6 @@ Where Pr.FechaFin Is Not Null And Pr.FechaFin<=getDate()
 Select M.Nombre as 'Nombre de Modulo', Pr.Nombre as 'Nombre de Proyecto' 
 From Modulos as M inner join Proyectos as Pr on M.IDProyecto=Pr.ID
 Where M.TiempoEstimado>100
-
 
 --10)Listar nombres de módulos, nombre del proyecto, descripción y tiempo estimado de aquellos módulos cuya fecha estimada de fin 
 --sea mayor a la fecha real de fin y el costo estimado del proyecto sea mayor a cien mil.
