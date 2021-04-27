@@ -39,21 +39,44 @@ Use BluePrint
 
 --10 Por cada tipo de tarea, la cantidad de colaboraciones registradas. Indicar el
 --tipo de tarea y la cantidad calculada.
-Select TT.Nombre, Count(*) as 'Cantidad de colaboraciones'
-From TiposTarea as TT Inner Join Tareas on TT.ID=Tareas.IDTipo Inner Join Colaboraciones on Tareas.ID=Colaboraciones.IDTarea
-Group by TT.Nombre Order by TT.Nombre Asc
+--Select TT.Nombre, Count(*) as 'Cantidad de colaboraciones'
+--From TiposTarea as TT Inner Join Tareas on TT.ID=Tareas.IDTipo Inner Join Colaboraciones on Tareas.ID=Colaboraciones.IDTarea
+--Group by TT.Nombre Order by TT.Nombre Asc
 
 --11 Por cada tipo de tarea, la cantidad de colaboradores distintos que la hayan
 --realizado. Indicar el tipo de tarea y la cantidad calculada.
+Select TT.Nombre, count(Col.ID) From TiposTarea as TT Inner Join Tareas on TT.ID=Tareas.IDTipo
+Inner Join Colaboraciones as Co on Tareas.ID=Co.IDTarea Inner Join Colaboradores as Col on Co.IDColaborador=Col.ID
+Group by TT.Nombre 
 
 --12 Por cada módulo, la cantidad total de horas trabajadas. Indicar el ID, nombre
 --del módulo y la cantidad totalizada. Mostrar los módulos sin horas registradas con 0.
 
+Select Distinct(M.Id), M.Nombre, Sum(Col.Tiempo) as 'Suma de tiempo'
+From Modulos as M 
+Right Join Tareas on M.ID=Tareas.IDModulo
+Inner Join Colaboraciones as Col on Tareas.ID=Col.IDTarea
+Group by M.Id, M.Nombre
+
 --13 Por cada módulo y tipo de tarea, el promedio de horas trabajadas. Indicar el ID
 --y nombre del módulo, el nombre del tipo de tarea y el total calculado.
 
+Select M.Id, M.Nombre, TT.Nombre, Avg(Col.Tiempo) as 'Promedio de horas'
+From Modulos as M
+Inner Join Tareas on M.ID=Tareas.IDModulo
+Inner Join Colaboraciones as Col on Tareas.Id=Col.IDTarea
+Inner Join TiposTarea as TT on Tareas.IDTipo=TT.ID
+Group By M.Id, M.Nombre, TT.Nombre
+
 --14 Por cada módulo, indicar su ID, apellido y nombre del colaborador y total que
 --se le debe abonar en concepto de colaboraciones realizadas en dicho módulo.
+
+Select M.Id, M.Nombre as 'Nombre de Modulo', Col.Apellido, Col.Nombre, Sum(Co.PrecioHora*Co.Tiempo) as 'Total a abonar'
+From Modulos as M
+Inner Join Tareas on M.ID=Tareas.IDModulo
+Inner Join Colaboraciones as Co on Tareas.Id=Co.IDTarea
+Inner Join Colaboradores as Col on Co.IDColaborador=Col.Id
+Group By M.Id, M.Nombre, Col.Apellido, Col.Nombre Order by M.Id Asc
 
 --15 Por cada proyecto indicar el nombre del proyecto y la cantidad de horas
 --registradas en concepto de colaboraciones y el total que debe abonar en concepto de colaboraciones.
