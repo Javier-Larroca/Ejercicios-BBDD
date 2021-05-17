@@ -13,14 +13,13 @@ Where IsNull(Pr.CostoEstimado,0) >
 --2 Listar razón social, cuit y contacto (email, celular o teléfono) de aquellos
 --clientes que no tengan proyectos que comiencen en el año 2020.
 SET DATEFORMAT 'DMY'
-Select Distinct(Cl.RazonSocial), Cl.CUIT, Coalesce(Cl.Email, Cl.Celular, Cl.Telefono) as Contacto
-From Clientes as Cl
-Inner Join Proyectos as Pr on Cl.ID=Pr.IDCliente
-Where Cl.Id not in (
-	Select Cl.ID
-	From Clientes as Cl
-	Where FechaInicio Between '01/01/2020' and '31/12/2020'
-	)
+
+select C.RazonSocial, C.CUIT, COALESCE(C.EMail, C.Celular, C.Telefono) as Contacto  from Clientes as C
+where C.ID not in (
+	select P.IDCliente 
+	from Proyectos as P
+	where YEAR(P.FechaInicio) = '2020'
+)
 
 --3 Listado de países que no tengan clientes relacionados.
 select * from paises where id not in (
@@ -31,17 +30,56 @@ select * from paises where id not in (
 
 --4 Listado de proyectos que no tengan tareas registradas.
 
+Select Nombre from Proyectos Where ID not in (
+	Select Distinct Pr.ID from Proyectos as Pr
+	Inner Join Modulos on Pr.ID=Modulos.IDProyecto
+	Inner Join Tareas on Modulos.ID=Tareas.IDModulo
+	)
+
 --5 Listado de tipos de tareas que no registren tareas pendientes.
 
---6 Listado con ID, nombre y costo estimado de proyectos cuyo costo estimado
---sea menor al costo estimado de cualquier proyecto de clientes extranjeros
---(clientes que no sean de Argentina o no tengan asociado un país).
+Select Nombre from TiposTarea Where ID not in (
+	Select TT.ID from TiposTarea as TT 
+	Inner Join Tareas on TT.ID=Tareas.IDTipo
+	Where Tareas.FechaFin is null
+	)
+
+--6 Listado con ID, nombre y costo estimado de proyectos cuyo costo estimado sea menor al costo estimado de cualquier 
+-- proyecto de clientes extranjeros (clientes que no sean de Argentina o no tengan asociado un país).
+
+Select ID, Nombre, CostoEstimado 
+From Proyectos 
+Where CostoEstimado < (
+	Select min(Pr.CostoEstimado) 
+	from Proyectos as Pr
+	Inner Join Clientes on Pr.IDCliente=Clientes.ID
+	Left Join Ciudades on Clientes.IDCiudad=Ciudades.ID
+	Left Join Paises on Ciudades.IDPais=Paises.ID
+	where Paises.Nombre = 'Argentina' or Clientes.IDCiudad is null
+	)
 
 --7 Listado de apellido y nombres de colaboradores que hayan demorado más en
 --una tarea que el colaborador de la ciudad de 'Buenos Aires' que más haya demorado.
 
+Select Distinct Col.Apellido, Col.Nombre 
+From Colaboradores as Col
+Inner Join Colaboraciones as Co on Col.ID=Co.IDColaborador
+Where Co.Tiempo > (
+	Select Max(Co2.Tiempo) 
+	From Colaboraciones as Co2
+	Inner Join Colaboradores as Col2 on Co2.IDColaborador=Col2.ID
+	Inner Join Ciudades on Col2.IDCiudad=Ciudades.Id
+	Where Ciudades.Nombre like 'Buenos Aires'
+	)
+
+
 --8 Listado de clientes indicando razón social, nombre del país (si tiene) y
 --cantidad de proyectos comenzados y cantidad de proyectos por comenzar.
+
+Select Cl.RazonSocial, P.Nombre,  
+From Clientes as Cl
+
+
 
 --9 Listado de tareas indicando nombre del módulo, nombre del tipo de tarea,
 --cantidad de colaboradores externos que la realizaron y cantidad de colaboradores internos que la realizaron.
