@@ -30,7 +30,9 @@ select * from paises where id not in (
 
 --4 Listado de proyectos que no tengan tareas registradas.
 
-Select Nombre from Proyectos Where ID not in (
+Select Nombre 
+from Proyectos 
+Where ID not in (
 	Select Distinct Pr.ID from Proyectos as Pr
 	Inner Join Modulos on Pr.ID=Modulos.IDProyecto
 	Inner Join Tareas on Modulos.ID=Tareas.IDModulo
@@ -76,13 +78,46 @@ Where Co.Tiempo > (
 --8 Listado de clientes indicando razón social, nombre del país (si tiene) y
 --cantidad de proyectos comenzados y cantidad de proyectos por comenzar.
 
-Select Cl.RazonSocial, P.Nombre,  
-From Clientes as Cl
-
+Select Cl.RazonSocial, COALESCE(Pa.Nombre, 'No tiene'), 
+(
+	Select Count(Pr.ID) 
+	from Proyectos as Pr 
+	Inner Join Clientes as Cli on Pr.IDCliente=Cli.ID 
+	Where Cli.ID=Cl.ID and Pr.FechaInicio>GETDATE()
+) as 'Proyec sin comenzar', 
+(
+	Select Count(Pr.ID) 
+	from Proyectos as Pr 
+	Inner Join Clientes as Cli on Pr.IDCliente=Cli.ID 
+	Where Cli.ID=Cl.ID and Pr.FechaInicio<=GETDATE()
+) as 'Proyectos comenzados'
+From Clientes as Cl 
+Left Join Ciudades as Ci on Cl.IDCiudad=Ci.ID
+Left Join Paises as Pa on Ci.IDPais=Pa.ID
 
 
 --9 Listado de tareas indicando nombre del módulo, nombre del tipo de tarea,
 --cantidad de colaboradores externos que la realizaron y cantidad de colaboradores internos que la realizaron.
+
+Select M.Nombre as 'Nombre Modulo', TT.Nombre as 'Nombre Tipo Tarea',
+(
+	Select Count(Cola.ID) 
+	from Colaboradores as Cola 
+	Inner Join Colaboraciones as Colab on Cola.ID=Colab.IDColaborador 
+	Inner Join Tareas as Ta on Colab.IDTarea=Ta.ID 
+	Where Cola.Tipo='E' and Ta.ID=T.ID
+) as 'Colaboradores Externos',
+(
+	Select Count(Cola.ID) 
+	from Colaboradores as Cola 
+	Inner Join Colaboraciones as Colab on Cola.ID=Colab.IDColaborador 
+	Inner Join Tareas as Ta on Colab.IDTarea=Ta.ID 
+	Where Cola.Tipo='I' and Ta.ID=T.ID
+) as 'Colaboradores Internos'
+From Modulos as M
+Inner Join Tareas as T on M.ID=T.IDModulo
+Inner Join TiposTarea as TT on T.IDTipo=TT.ID
+
 
 --10 Listado de proyectos indicando nombre del proyecto, costo estimado,
 --cantidad de módulos cuya estimación de fin haya sido exacta, cantidad de
@@ -110,6 +145,18 @@ From Clientes as Cl
 --palabra 'Testing' en su nombre. Ídem para Programación.
 
 --15 Listado apellido y nombres de los colaboradores que no hayan realizado tareas de 'Diseño de base de datos'.
+
+Select Col.Apellido, Col.Nombre 
+From Colaboradores Col
+Where Col.Id Not In (
+	Select Cola.Id
+	From Colaboradores as Cola 
+	Inner Join Colaboraciones as Colab on Cola.ID=Colab.IDColaborador
+	Inner Join Tareas as T on Colab.IDTarea=T.ID
+	Inner Join TiposTarea as TT on T.IDTipo=TT.ID
+	Where TT.Nombre='Diseño de base de datos'
+	)
+
 
 --16 Por cada país listar el nombre, la cantidad de clientes y la cantidad de colaboradores
 
