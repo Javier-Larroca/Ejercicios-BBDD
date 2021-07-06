@@ -1,0 +1,34 @@
+COMANDOS GIT:
+
++Indicar que nuestra carpeta local va a estar vonculada con un repositorio de GitHub
+	git init 
+
++Vincular la carpeta con nuestra carpeta de Github
+	git remote add origin https://github.com/Javier-Larroca/Ejerc...etcetc.git
+
++Clonar repositorio de GitHub:
+	git clone https:\\github...
+
++Ver estado de carpeta:
+	git status
+
++Agregar archivo nuevo al proyecto:
+	git add archivo.txt
+
++Ver diferencias entre archivos:
+	git diff
+
++Añadir todos los archivos:
+	git add .
+
++Comentar:
+	git commit -m "Comentario de añadido"
+
++Subir los archivos al GitHub:
+	git push (Siempre en cuando ya tengamos sesion iniciada y hayamos hecho previamente un git commit)
+
++Actualizar tu carpeta (Descarga los cambios que haya hecho la otra persona):
+	git pull 
+
++Deshacer cambios al ultimo push realizado/ultimo pull descargado
+        git reset --hard

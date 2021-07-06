@@ -1,5 +1,8 @@
+
+Use BluePrint
 /*
-Hacer un reporte que liste por cada tipo de tarea se liste el nombre, el precio de hora base y el promedio de valor hora real (obtenido de las colaboraciones).
+Hacer un reporte que liste por cada tipo de tarea se liste el nombre, el precio de hora base y el promedio de valor 
+hora real (obtenido de las colaboraciones).
 */
 Create View VW_ReporteTiposTarea as
 Select Aux.*, Aux.PromPrecioHora-Aux.PrecioHoraBase as Dif From (
@@ -11,6 +14,7 @@ select tt.Nombre, tt.PrecioHoraBase,
 ) as PromPrecioHora
 from TiposTarea tt
 ) as Aux
+
 Go
 /*
 Modificar el reporte de (1) para que también liste una columna llamada Variación con las siguientes reglas:
